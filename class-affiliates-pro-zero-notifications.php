@@ -61,26 +61,26 @@ class Affiliates_Pro_Zero_Notifications {
 	 * @since     1.0.0
 	 */
 	private function __construct() {
-		add_action( 'init', 'init_no_zero_notifications' );
+		add_action( 'init', array($this, 'init_no_zero_notifications' ) );
+	}
 
-		function init_no_zero_notifications() {
-			add_action( 'affiliates_referral', 'no_zero_notifications', 9 );
-			add_action( 'affiliates_updated_referral', 'no_zero_notifications', 9 );
-		}
+	function init_no_zero_notifications() {
+		add_action( 'affiliates_referral', array($this, 'no_zero_notifications', 9 ) );
+		add_action( 'affiliates_updated_referral', array($this, 'no_zero_notifications', 9 ) );
+	}
 
-		function no_zero_notifications( $referral_id ) {
-			global $wpdb;
-			$referrals_table = _affiliates_get_tablename( 'referrals' );
-			$amount = $wpdb->get_var( $wpdb->prepare( "SELECT amount FROM $referrals_table WHERE referral_id = %d", $referral_id ) );
-			if ( floatval( $amount ) <= 0 ) {
+	function no_zero_notifications( $referral_id ) {
+		global $wpdb;
+		$referrals_table = _affiliates_get_tablename( 'referrals' );
+		$amount = $wpdb->get_var( $wpdb->prepare( "SELECT amount FROM $referrals_table WHERE referral_id = %d", $referral_id ) );
+		if ( floatval( $amount ) <= 0 ) {
 
-				//make sure no email is sent to affiliate
-				remove_action( 'affiliates_referral', array( 'Affiliates_Notifications', 'affiliates_referral' ) );
-				remove_action( 'affiliates_updated_referral', array( 'Affiliates_Notifications', 'affiliates_updated_referral' ) );
+			//make sure no email is sent to affiliate
+			remove_action( 'affiliates_referral', array( 'Affiliates_Notifications', 'affiliates_referral' ) );
+			remove_action( 'affiliates_updated_referral', array( 'Affiliates_Notifications', 'affiliates_updated_referral' ) );
 
-				//delete zero referral
-				$wpdb->delete( "$referrals_table", array( 'referral_id' => $referral_id ) );
-			}
+			//delete zero referral
+			$wpdb->delete( "$referrals_table", array( 'referral_id' => $referral_id ) );
 		}
 	}
 }
